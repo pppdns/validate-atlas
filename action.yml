@@ -30,11 +30,17 @@ runs:
       id: validate
       shell: bash
       run: |
-        # Resolve the absolute path to the file (relative to the calling workflow's workspace)
+        # Store the relative file path for annotations
+        RELATIVE_FILE_PATH="${{ inputs.file_path }}"
+        
+        # Resolve the absolute path to the file for validation
         FILE_PATH="${{ inputs.file_path }}"
         if [[ ! "$FILE_PATH" = /* ]]; then
           FILE_PATH="${{ github.workspace }}/$FILE_PATH"
         fi
+        
+        # Set the relative path as an environment variable for the validator
+        export GITHUB_ACTION_FILE_PATH="$RELATIVE_FILE_PATH"
         
         # Run validator from action directory
         cd ${{ github.action_path }}

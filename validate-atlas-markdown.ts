@@ -653,7 +653,9 @@ function printResults(issues: ValidationIssue[], filePath: string): void {
 
   // Output GitHub Actions annotations
   if (isGitHubActions) {
-    issues.forEach((issue) => outputGitHubAnnotation(issue, filePath));
+    // Use relative path if provided via environment variable, otherwise use the full path
+    const annotationPath = process.env.GITHUB_ACTION_FILE_PATH || filePath;
+    issues.forEach((issue) => outputGitHubAnnotation(issue, annotationPath));
   }
 
   // Summary
