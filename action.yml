@@ -45,7 +45,8 @@ runs:
         # Run validator from action directory
         cd ${{ github.action_path }}
         
-        # Create a temp file for capturing output
+        # Create output file in workspace for access by calling workflow
+        OUTPUT_FILE="${{ github.workspace }}/validation-summary.md"
         TEMP_OUTPUT=$(mktemp)
         
         # Run validation and capture output
@@ -65,6 +66,13 @@ runs:
           echo "### ✅ Validation Passed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "No issues found!" >> $GITHUB_STEP_SUMMARY
+          
+          # Create summary file for PR comments
+          echo "## ✅ Atlas Validation Passed" > "$OUTPUT_FILE"
+          echo "" >> "$OUTPUT_FILE"
+          echo "**File:** \`$RELATIVE_FILE_PATH\`" >> "$OUTPUT_FILE"
+          echo "" >> "$OUTPUT_FILE"
+          echo "No validation errors found!" >> "$OUTPUT_FILE"
         else
           echo "has_errors=true" >> $GITHUB_OUTPUT
           echo "### ❌ Validation Failed" >> $GITHUB_STEP_SUMMARY
@@ -77,11 +85,24 @@ runs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "</details>" >> $GITHUB_STEP_SUMMARY
           
+          # Create summary file for PR comments
+          echo "## ❌ Atlas Validation Failed" > "$OUTPUT_FILE"
+          echo "" >> "$OUTPUT_FILE"
+          echo "**File:** \`$RELATIVE_FILE_PATH\`" >> "$OUTPUT_FILE"
+          echo "" >> "$OUTPUT_FILE"
+          echo "<details>" >> "$OUTPUT_FILE"
+          echo "<summary>📋 Click to see all validation errors</summary>" >> "$OUTPUT_FILE"
+          echo "" >> "$OUTPUT_FILE"
+          echo "\`\`\`" >> "$OUTPUT_FILE"
+          cat "$TEMP_OUTPUT" >> "$OUTPUT_FILE"
+          echo "\`\`\`" >> "$OUTPUT_FILE"
+          echo "</details>" >> "$OUTPUT_FILE"
+          
           # Also output errors as annotations
-          echo "::error title=Atlas Validation Failed::Check the Job Summary for detailed validation errors in $RELATIVE_FILE_PATH"
+          echo "::error title=Atlas Validation Failed::Check the Job Summary or PR comment for detailed validation errors in $RELATIVE_FILE_PATH"
         fi
         
-        # Cleanup
+        # Cleanup temp file
         rm -f "$TEMP_OUTPUT"
         
         # Exit with validation result
