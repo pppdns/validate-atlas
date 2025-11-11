@@ -44,10 +44,46 @@ runs:
         
         # Run validator from action directory
         cd ${{ github.action_path }}
-        if npx tsx validate-atlas-markdown.ts "$FILE_PATH"; then
+        
+        # Create a temp file for capturing output
+        TEMP_OUTPUT=$(mktemp)
+        
+        # Run validation and capture output
+        set +e  # Don't exit on error immediately
+        npx tsx validate-atlas-markdown.ts "$FILE_PATH" 2>&1 | tee "$TEMP_OUTPUT"
+        EXIT_CODE=$?
+        set -e
+        
+        # Create Job Summary (visible in PR checks)
+        echo "## 📋 Atlas Validation Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**File:** \`$RELATIVE_FILE_PATH\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ $EXIT_CODE -eq 0 ]; then
           echo "has_errors=false" >> $GITHUB_OUTPUT
+          echo "### ✅ Validation Passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No issues found!" >> $GITHUB_STEP_SUMMARY
         else
           echo "has_errors=true" >> $GITHUB_OUTPUT
-          exit 1
+          echo "### ❌ Validation Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to see all validation errors</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat "$TEMP_OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          
+          # Also output errors as annotations
+          echo "::error title=Atlas Validation Failed::Check the Job Summary for detailed validation errors in $RELATIVE_FILE_PATH"
         fi
+        
+        # Cleanup
+        rm -f "$TEMP_OUTPUT"
+        
+        # Exit with validation result
+        exit $EXIT_CODE
 

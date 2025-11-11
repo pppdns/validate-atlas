@@ -3,10 +3,10 @@ name: Validate Atlas Documentation
 on:
   push:
     branches:
-      - main
+      - stable
   pull_request:
     branches:
-      - main
+      - stable
 
 jobs:
   validate:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Validate Atlas Markdown
-        uses: pppdns/validate-atlas@v1  # or use @main for latest
+        uses: pppdns/validate-atlas@main
         with:
           file_path: docs/atlas.md
 
