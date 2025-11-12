@@ -1,4 +1,4 @@
-# validate-atlas
+# Sky Atlas Validator
 
 [![CI](https://github.com/pppdns/validate-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/pppdns/validate-atlas/actions/workflows/ci.yml)
 
@@ -18,7 +18,7 @@ Atlas Markdown Validator - Comprehensive validator for Atlas Markdown files with
 2. **Document Types** - Ensures document type is one of the 12 valid Atlas document types
 3. **Heading Hierarchy** - Checks sequential heading levels (no skipping from # to ###)
 4. **Blank Lines** - Validates required blank lines after titles and around extra fields
-5. **Extra Fields** - Validates format, order, and presence of required fields
+5. **Extra Fields** - Validates format, order, and presence of required fields (for Type Specification, Scenario, Scenario Variation documents)
 6. **Document Numbering** - Validates patterns for all 12 document types (e.g., A.1, NR-1, .0.3.1)
 7. **Nesting Rules** - Ensures valid parent-child type combinations
 8. **UUID Validation** - Checks format (UUID v4), uniqueness, and warns about empty UUIDs
@@ -190,4 +190,4 @@ ISC
 
 ## Author
 
-pppdns
+Atlas Axis
