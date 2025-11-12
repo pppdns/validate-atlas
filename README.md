@@ -30,33 +30,6 @@ Atlas Markdown Validator - Comprehensive validator for Atlas Markdown files with
 Add this to your workflow file (e.g., `.github/workflows/validate.yml`):
 
 ```yaml
-name: Validate Atlas Markdown
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Validate Atlas Markdown
-        uses: pppdns/validate-atlas@v1  # or use @main for latest
-        with:
-          file_path: docs/atlas.md
-```
-
-### Pull Request Validation with Comments
-
-```yaml
 name: Validate Atlas on Pull Request
 
 on:
